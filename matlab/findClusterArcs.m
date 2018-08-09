@@ -331,8 +331,24 @@ end
 
 % do arc merging and produce output files analogous to the ones without
 % the merging
+
+% EDITS HERE
+% USES MEAN IMAGE AS GUIDE FOR CLUSTERING 
+if strcmp( gxyName(end), 'n')
+    fprintf('in mean image clustering\n');
+    clusMtxsM = mergeClustersByFit(clusMtxs, ctrR, ctrC, barInfo, stgs);
+    save([outputPath '-meanClusters.mat'], 'clusMtxsM');
+else
+    fprintf('using mean image guide\n');
+    color = outputPath(end-1:end);
+    meanFilepath = regexprep(outputPath, color, '_mean');
+    meanClus = matfile([meanFilepath '-meanClusters.mat']);
+    clusMtxsM = mergeClustersByGuide(clusMtxs, meanClus.clusMtxsM, 1.0);
+    save([outputPath 'Clusters.mat'], 'clusMtxsM');
+end
+
 failed2revDuringMerge = false;
-clusMtxsM = mergeClustersByFit(clusMtxs, ctrR, ctrC, barInfo, stgs);
+%clusMtxsM = mergeClustersByFit(clusMtxs, ctrR, ctrC, barInfo, stgs);
 [lgspParamsM, lgspBoundsM, sumSqErrsM, used2revM, failed2revM, hasBadBoundsM] = ...
     fitLogSpiralsToClusters(clusMtxsM, ctrR, ctrC, stgs);
 [barClusM, lgspParamsM, lgspBoundsM, sumSqErrsM, used2revM, failed2revM, hasBadBoundsM, clusMtxsM, barAnglesM, barHalfLensM] = ...
